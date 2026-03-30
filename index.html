@@ -16,9 +16,6 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
     <style>
-      /* ==========================================
-         VARIÁVEIS E RESET
-         ========================================== */
       * {
         box-sizing: border-box;
         margin: 0;
@@ -49,16 +46,13 @@
         min-height: 100vh;
       }
 
-      /* ==========================================
-         LOGIN (REESTRUTURADO)
-         ========================================== */
+      /* LOGIN */
       #login-screen {
         display: flex;
         align-items: center;
         justify-content: center;
         min-height: 100vh;
         padding: 20px;
-        background: var(--bg);
       }
       .login-card {
         background: var(--bg2);
@@ -67,10 +61,11 @@
         padding: 40px 30px;
         width: 100%;
         max-width: 380px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        text-align: center;
       }
       .login-group {
         margin-bottom: 20px;
+        text-align: left;
       }
       .login-group label {
         display: block;
@@ -89,7 +84,7 @@
         color: var(--text);
         font-size: 16px;
       }
-      .login-btn {
+      .btn-primary {
         width: 100%;
         padding: 15px;
         border-radius: 10px;
@@ -100,13 +95,10 @@
         cursor: pointer;
       }
 
-      /* ==========================================
-         APP LAYOUT (MOBILE FIRST)
-         ========================================== */
+      /* LAYOUT MOBILE FIRST */
       #app-screen {
         display: none;
       }
-
       .sidebar {
         position: fixed;
         bottom: 0;
@@ -116,7 +108,6 @@
         background: var(--bg2);
         border-top: 1px solid var(--border);
         display: flex;
-        flex-direction: row;
         justify-content: space-around;
         align-items: center;
         z-index: 1000;
@@ -133,24 +124,45 @@
       .nav-item.active {
         color: var(--accent);
       }
-
       .main {
         margin-left: 0;
         padding-bottom: 80px;
+        width: 100%;
       }
       .topbar {
-        padding: 20px;
+        padding: 15px;
         background: var(--bg);
         border-bottom: 1px solid var(--border);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 900;
       }
       .content {
         padding: 15px;
       }
 
-      /* Grid de Métricas 2 por linha no Mobile */
+      /* FILTROS */
+      .filters-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      select,
+      input[type="month"],
+      input[type="date"],
+      input[type="number"],
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        background: var(--bg3);
+        color: white;
+        border-radius: 8px;
+        border: 1px solid var(--border2);
+        font-size: 14px;
+      }
+
+      /* METRICAS */
       .metrics {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -163,12 +175,19 @@
         border-radius: 12px;
         border: 1px solid var(--border);
       }
+      .metric-label {
+        font-size: 10px;
+        color: var(--text3);
+        text-transform: uppercase;
+        margin-bottom: 5px;
+      }
       .metric-value {
-        font-size: 18px;
+        font-size: 16px;
         font-family: "DM Mono", monospace;
+        font-weight: 600;
       }
 
-      /* Tabelas Roláveis */
+      /* CARDS E TABELAS */
       .card {
         background: var(--card);
         padding: 15px;
@@ -179,7 +198,7 @@
       table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 500px;
+        min-width: 450px;
       }
       td,
       th {
@@ -188,26 +207,28 @@
         border-bottom: 1px solid var(--border);
         font-size: 13px;
       }
-
-      /* Formulário em 1 coluna no Mobile */
-      .form-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 15px;
+      .green {
+        color: var(--green);
       }
-      .form-group input,
-      .form-group select {
-        width: 100%;
-        padding: 12px;
-        background: var(--bg3);
-        border: 1px solid var(--border2);
-        color: var(--text);
-        border-radius: 8px;
+      .red {
+        color: var(--red);
+      }
+      .badge {
+        padding: 4px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 600;
+      }
+      .badge-green {
+        background: rgba(46, 192, 138, 0.1);
+        color: var(--green);
+      }
+      .badge-amber {
+        background: rgba(245, 166, 35, 0.1);
+        color: var(--amber);
       }
 
-      /* ==========================================
-         AJUSTES PARA DESKTOP (> 768px)
-         ========================================== */
+      /* DESKTOP (> 768px) */
       @media (min-width: 768px) {
         .sidebar {
           top: 0;
@@ -235,143 +256,108 @@
         .metrics {
           grid-template-columns: repeat(4, 1fr);
         }
-        .form-grid {
-          grid-template-columns: 1fr 1fr;
+        .filters-row {
+          grid-template-columns: 200px 200px;
         }
-      }
-
-      .green {
-        color: var(--green);
-      }
-      .red {
-        color: var(--red);
-      }
-      .badge {
-        padding: 4px 8px;
-        border-radius: 10px;
-        font-size: 10px;
-      }
-      .badge-green {
-        background: rgba(46, 192, 138, 0.1);
-        color: var(--green);
-      }
-      .badge-amber {
-        background: rgba(245, 166, 35, 0.1);
-        color: var(--amber);
       }
     </style>
   </head>
   <body>
     <div id="login-screen">
       <div class="login-card">
-        <h2 style="margin-bottom: 20px; text-align: center">Entrar</h2>
+        <h2>Entrar</h2>
         <div class="login-group">
           <label>Usuário</label><input type="text" id="l-user" />
         </div>
         <div class="login-group">
           <label>Senha</label><input type="password" id="l-pass" />
         </div>
-        <button class="login-btn" onclick="doLogin()">Acessar Sistema</button>
+        <button class="btn-primary" onclick="doLogin()">Acessar</button>
       </div>
     </div>
 
     <div id="app-screen">
       <div class="sidebar">
         <div class="nav-item active" onclick="showPage('dashboard', this)">
-          <span>📊</span> Resumo
+          📊 Resumo
         </div>
         <div class="nav-item" onclick="showPage('lancamentos', this)">
-          <span>📋</span> Lista
+          📋 Lista
         </div>
-        <div class="nav-item" onclick="showPage('prazos', this)">
-          <span>🗓</span> Prazos
-        </div>
+        <div class="nav-item" onclick="showPage('prazos', this)">🗓 Prazos</div>
         <div class="nav-item" onclick="showPage('relatorios', this)">
-          <span>📈</span> Relatórios
+          📈 Gráficos
         </div>
       </div>
 
       <div class="main">
         <div class="topbar">
-          <div id="page-title" style="font-weight: 600">Painel Financeiro</div>
+          <div class="filters-row">
+            <input type="month" id="filtro-mes" onchange="renderTudo()" />
+            <select id="filtro-usuario" onchange="renderTudo()">
+              <option value="todos">Todos</option>
+              <option value="Felipe">Felipe</option>
+              <option value="João">João</option>
+              <option value="Annia">Annia</option>
+            </select>
+          </div>
           <button
-            class="login-btn"
-            style="width: auto; padding: 8px 15px"
+            class="btn-primary"
+            style="padding: 8px"
             onclick="
               showPage('lancamentos');
               openForm();
             "
           >
-            + Novo
+            + Novo Lançamento
           </button>
         </div>
 
         <div class="content">
           <div id="page-dashboard" class="page active">
-            <select
-              id="filtro-usuario"
-              onchange="renderTudo()"
-              style="
-                width: 100%;
-                padding: 10px;
-                margin-bottom: 20px;
-                background: var(--bg3);
-                color: white;
-                border-radius: 8px;
-                border: 1px solid var(--border2);
-              "
-            >
-              <option value="todos">Todos os Usuários</option>
-              <option value="Felipe">Felipe</option>
-              <option value="João">João</option>
-              <option value="Annia">Annia</option>
-            </select>
             <div class="metrics" id="metrics-cards"></div>
             <div class="card">
-              <canvas id="mainChart" style="max-height: 250px"></canvas>
+              <h3>Fluxo</h3>
+              <canvas id="mainChart"></canvas>
             </div>
           </div>
 
           <div id="page-lancamentos" class="page" style="display: none">
             <div id="form-lancamento" class="card" style="display: none">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Tipo</label
-                  ><select id="f-tipo">
-                    <option value="saida">Saída</option>
-                    <option value="entrada">Entrada</option>
-                  </select>
+              <div style="display: grid; gap: 10px">
+                <input type="text" id="f-desc" placeholder="Descrição" />
+                <input
+                  type="number"
+                  id="f-valor"
+                  step="0.01"
+                  placeholder="Valor"
+                />
+                <input type="date" id="f-data" />
+                <select id="f-tipo">
+                  <option value="saida">Saída</option>
+                  <option value="entrada">Entrada</option>
+                </select>
+                <select id="f-usuario">
+                  <option value="João">João</option>
+                  <option value="Felipe">Felipe</option>
+                  <option value="Annia">Annia</option>
+                </select>
+                <select id="f-status">
+                  <option value="pago">Pago</option>
+                  <option value="pendente">Pendente</option>
+                </select>
+                <div style="display: flex; gap: 10px">
+                  <button class="btn-primary" onclick="salvarNoBanco()">
+                    Salvar
+                  </button>
+                  <button
+                    class="btn-primary"
+                    style="background: #555"
+                    onclick="closeForm()"
+                  >
+                    Cancelar
+                  </button>
                 </div>
-                <div class="form-group">
-                  <label>Valor</label
-                  ><input type="number" id="f-valor" step="0.01" />
-                </div>
-                <div class="form-group">
-                  <label>Data</label><input type="date" id="f-data" />
-                </div>
-                <div class="form-group">
-                  <label>Responsável</label
-                  ><select id="f-usuario">
-                    <option value="Felipe">Felipe</option>
-                    <option value="João">João</option>
-                    <option value="Annia">Annia</option>
-                  </select>
-                </div>
-                <div class="form-group" style="grid-column: 1/-1">
-                  <label>Descrição</label><input type="text" id="f-desc" />
-                </div>
-              </div>
-              <div style="margin-top: 15px; display: flex; gap: 10px">
-                <button class="login-btn" onclick="salvarNoBanco()">
-                  Gravar
-                </button>
-                <button
-                  class="login-btn"
-                  style="background: #444"
-                  onclick="closeForm()"
-                >
-                  Fechar
-                </button>
               </div>
             </div>
             <div class="card">
@@ -381,8 +367,7 @@
                     <th>Data</th>
                     <th>Descrição</th>
                     <th>Valor</th>
-                    <th>Status</th>
-                    <th>Ações</th>
+                    <th>Ação</th>
                   </tr>
                 </thead>
                 <tbody id="tb-corpo"></tbody>
@@ -392,10 +377,31 @@
 
           <div id="page-prazos" class="page" style="display: none">
             <div class="card"><div id="calendar"></div></div>
+            <div class="card">
+              <h3>Pendências de Pagamento</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Vencimento</th>
+                    <th>O que é</th>
+                    <th>Valor</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="tb-pendencias"></tbody>
+              </table>
+            </div>
           </div>
 
           <div id="page-relatorios" class="page" style="display: none">
-            <div class="card"><canvas id="pizzaChart"></canvas></div>
+            <div class="card">
+              <h3>Gastos por Usuário</h3>
+              <canvas id="userChart"></canvas>
+            </div>
+            <div class="card">
+              <h3>Gastos por Categoria</h3>
+              <canvas id="catChart"></canvas>
+            </div>
           </div>
         </div>
       </div>
@@ -408,11 +414,13 @@
       const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
       let lancamentos = [],
-        meuGraficoLinha = null,
-        meuGraficoPizza = null,
+        charts = {},
         calendar = null;
       const fmt = (v) =>
         "R$ " + (v || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+      document.getElementById("filtro-mes").value = new Date()
+        .toISOString()
+        .substring(0, 7);
 
       function doLogin() {
         if (
@@ -421,9 +429,9 @@
         ) {
           sessionStorage.setItem("auth_joao", "true");
           document.getElementById("login-screen").style.display = "none";
-          document.getElementById("app-screen").style.display = "flex";
+          document.getElementById("app-screen").style.display = "block";
           carregarDados();
-        } else alert("Senha incorreta!");
+        } else alert("Acesso negado.");
       }
 
       async function carregarDados() {
@@ -439,12 +447,12 @@
 
       async function salvarNoBanco() {
         const dados = {
-          tipo: document.getElementById("f-tipo").value,
-          data: document.getElementById("f-data").value,
-          valor: parseFloat(document.getElementById("f-valor").value),
-          status: "pago",
           description: document.getElementById("f-desc").value,
+          valor: parseFloat(document.getElementById("f-valor").value),
+          data: document.getElementById("f-data").value,
+          tipo: document.getElementById("f-tipo").value,
           usuario: document.getElementById("f-usuario").value,
+          status: document.getElementById("f-status").value,
           cat: "Geral",
         };
         await _supabase.from("lancamentos2").insert([dados]);
@@ -452,67 +460,104 @@
         carregarDados();
       }
 
-      async function deletar(id) {
-        if (confirm("Excluir?")) {
-          await _supabase.from("lancamentos2").delete().eq("id", id);
-          carregarDados();
-        }
+      async function marcarPago(id) {
+        await _supabase
+          .from("lancamentos2")
+          .update({ status: "pago" })
+          .eq("id", id);
+        carregarDados();
       }
 
       function renderTudo() {
-        const filtro = document.getElementById("filtro-usuario").value;
-        const dados = lancamentos.filter(
-          (l) => filtro === "todos" || l.usuario === filtro,
+        const fMes = document.getElementById("filtro-mes").value;
+        const fUser = document.getElementById("filtro-usuario").value;
+
+        const filtrados = lancamentos.filter(
+          (l) =>
+            (fUser === "todos" || l.usuario === fUser) &&
+            l.data.substring(0, 7) === fMes,
         );
 
         let ent = 0,
-          sai = 0;
-        const corpo = document.getElementById("tb-corpo");
+          sai = 0,
+          pen = 0,
+          sUser = {};
+        const corpo = document.getElementById("tb-corpo"),
+          corpoPen = document.getElementById("tb-pendencias");
         corpo.innerHTML = "";
+        corpoPen.innerHTML = "";
+        let evs = [];
 
-        dados.forEach((l) => {
-          if (l.tipo === "entrada") ent += l.valor;
-          else sai += l.valor;
-          corpo.innerHTML += `<tr>
-            <td>${l.data.split("-").reverse().slice(0, 2).join("/")}</td>
-            <td>${l.description}<br><small>${l.usuario}</small></td>
-            <td class="${l.tipo === "entrada" ? "green" : "red"}">${fmt(l.valor)}</td>
-            <td><span class="badge ${l.status === "pago" ? "badge-green" : "badge-amber"}">${l.status}</span></td>
-            <td><button onclick="deletar('${l.id}')" style="background:none; border:none; color:gray;">✖</button></td>
-          </tr>`;
+        filtrados.forEach((l) => {
+          const v = parseFloat(l.valor) || 0;
+          if (l.status === "pago") {
+            if (l.tipo === "entrada") ent += v;
+            else {
+              sai += v;
+              sUser[l.usuario] = (sUser[l.usuario] || 0) + v;
+            }
+          } else {
+            pen += v;
+            corpoPen.innerHTML += `<tr><td>${l.data}</td><td>${l.description}</td><td>${fmt(v)}</td><td><button onclick="marcarPago('${l.id}')">✔</button></td></tr>`;
+            evs.push({ title: l.description, start: l.data, color: "#f5a623" });
+          }
+          corpo.innerHTML += `<tr><td>${l.data.substring(8, 10)}/${l.data.substring(5, 7)}</td><td>${l.description}<br><small>${l.usuario}</small></td><td class="${l.tipo === "entrada" ? "green" : "red"}">${fmt(v)}</td><td><span class="badge ${l.status === "pago" ? "badge-green" : "badge-amber"}">${l.status}</span></td></tr>`;
         });
 
         document.getElementById("metrics-cards").innerHTML = `
           <div class="metric"><div class="metric-label">Ganhos</div><div class="metric-value green">${fmt(ent)}</div></div>
           <div class="metric"><div class="metric-label">Gastos</div><div class="metric-value red">${fmt(sai)}</div></div>
-        `;
-        desenharGraficos(dados);
+          <div class="metric"><div class="metric-label">Saldo</div><div class="metric-value" style="color:var(--accent)">${fmt(ent - sai)}</div></div>
+          <div class="metric"><div class="metric-label">Pendentes</div><div class="metric-value" style="color:var(--amber)">${fmt(pen)}</div></div>`;
+
+        initCharts(filtrados, sUser);
+        initCalendar(evs);
       }
 
-      function desenharGraficos(dados) {
-        const ctx = document.getElementById("mainChart").getContext("2d");
-        if (meuGraficoLinha) meuGraficoLinha.destroy();
-        meuGraficoLinha = new Chart(ctx, {
+      function initCharts(dados, sUser) {
+        if (charts.l) charts.l.destroy();
+        if (charts.u) charts.u.destroy();
+        charts.l = new Chart(document.getElementById("mainChart"), {
           type: "line",
           data: {
-            labels: dados
-              .slice(0, 7)
-              .reverse()
-              .map((l) => l.data),
+            labels: dados.map((l) => l.data.substring(8, 10)),
             datasets: [
               {
-                label: "Fluxo",
-                data: dados
-                  .slice(0, 7)
-                  .reverse()
-                  .map((l) => (l.tipo === "entrada" ? l.valor : -l.valor)),
+                label: "Valor",
+                data: dados.map((l) =>
+                  l.tipo === "entrada" ? l.valor : -l.valor,
+                ),
                 borderColor: "#4f8ef7",
-                tension: 0.3,
               },
             ],
           },
-          options: { plugins: { legend: { display: false } } },
         });
+        charts.u = new Chart(document.getElementById("userChart"), {
+          type: "doughnut",
+          data: {
+            labels: Object.keys(sUser),
+            datasets: [
+              {
+                data: Object.values(sUser),
+                backgroundColor: ["#4f8ef7", "#2ec08a", "#9b7cf4"],
+              },
+            ],
+          },
+        });
+      }
+
+      function initCalendar(evs) {
+        if (calendar) calendar.destroy();
+        calendar = new FullCalendar.Calendar(
+          document.getElementById("calendar"),
+          {
+            initialView: "dayGridMonth",
+            locale: "pt-br",
+            events: evs,
+            height: 350,
+          },
+        );
+        calendar.render();
       }
 
       function showPage(p, el) {
@@ -524,6 +569,8 @@
           .querySelectorAll(".nav-item")
           .forEach((i) => i.classList.remove("active"));
         if (el) el.classList.add("active");
+        if (p === "prazos" && calendar)
+          setTimeout(() => calendar.updateSize(), 100);
       }
 
       function openForm() {
@@ -535,7 +582,7 @@
 
       if (sessionStorage.getItem("auth_joao") === "true") {
         document.getElementById("login-screen").style.display = "none";
-        document.getElementById("app-screen").style.display = "flex";
+        document.getElementById("app-screen").style.display = "block";
         carregarDados();
       }
     </script>
