@@ -407,6 +407,9 @@
         <div class="nav-item" onclick="showPage('relatorios', this)">
           <span>📈</span> Relatórios
         </div>
+        <div class="nav-item" onclick="showPage('config', this)">
+          <span>⚙️</span> Usuários
+        </div>
         <div
           class="nav-item"
           style="margin-top: auto; color: var(--red)"
@@ -442,18 +445,6 @@
               onclick="openForm()"
             >
               + Novo Lançamento
-            </button>
-            <button
-              class="btn-primary"
-              style="
-                width: auto;
-                padding: 12px 20px;
-                background: var(--bg2);
-                border: 1px solid var(--border2);
-              "
-              onclick="promptNovoUsuario()"
-            >
-              + Add Pessoa
             </button>
           </div>
 
@@ -681,6 +672,37 @@
         </div>
       </div>
     </div>
+    <div id="page-config" class="page" style="display: none">
+      <div class="card">
+        <h3 style="margin-bottom: 20px">Gerenciar Membros do Grupo</h3>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 20px">
+          <input
+            type="text"
+            id="novo-membro-nome"
+            placeholder="Nome do novo membro..."
+            style="flex: 1"
+          />
+          <button
+            class="btn-primary"
+            style="width: auto; padding: 10px 20px"
+            onclick="adicionarMembro()"
+          >
+            Adicionar
+          </button>
+        </div>
+
+        <table style="min-width: 100%">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th style="text-align: right">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tb-membros"></tbody>
+        </table>
+      </div>
+    </div>
     <script>
       // Configurações Supabase
       const SB_URL = "https://zgcimyinowcgwegsjilq.supabase.co";
@@ -732,32 +754,55 @@
       }
 
       function doLogout() {
-        sessionStorage.clear();
-        location.reload();
+        if (confirm("Tem certeza que deseja sair da sua conta?")) {
+          sessionStorage.clear();
+          location.reload();
+        }
       }
 
-      // --- BUSCA DE DADOS (LANÇAMENTOS + MEMBROS) ---
+      // --- BUSCA DE DADOS ---
       async function carregarDados() {
         const tabela = sessionStorage.getItem("tabela_ativa");
+        const { data, error } = await _supabase
+          .from(tabela)
+          .select("*")
+          .order("data", { ascending: true });
 
-        const [resLanc, resMembros] = await Promise.all([
-          _supabase.from(tabela).select("*").order("data", { ascending: true }),
-          _supabase
-            .from("membros_grupo")
-            .select("nome")
-            .eq("tabela_origem", tabela),
-        ]);
-
-        if (!resLanc.error) lancamentos = resLanc.data;
-
-        const membros = resMembros.data
-          ? resMembros.data.map((m) => m.nome)
-          : [];
-        atualizarSelectsUsuarios(membros);
-        renderTudo();
+        if (!error) {
+          lancamentos = data;
+          await carregarMembros(); // Carrega os membros e atualiza a interface
+          renderTudo();
+        }
       }
 
-      function atualizarSelectsUsuarios(membros) {
+      // --- GESTÃO DE MEMBROS (NOVA ABA) ---
+      async function carregarMembros() {
+        const tabela = sessionStorage.getItem("tabela_ativa");
+        const { data, error } = await _supabase
+          .from("membros_grupo")
+          .select("*")
+          .eq("tabela_origem", tabela)
+          .order("nome", { ascending: true });
+
+        if (error) return console.error("Erro ao buscar membros:", error);
+
+        // 1. Atualiza a tabela na aba de Usuários
+        const corpoMembros = document.getElementById("tb-membros");
+        if (corpoMembros) {
+          corpoMembros.innerHTML = "";
+          data.forEach((m) => {
+            corpoMembros.innerHTML += `
+        <tr>
+          <td>${m.nome}</td>
+          <td style="text-align: right">
+            <button onclick="deletarMembro('${m.id}')" style="background:none; border:none; color:var(--red); cursor:pointer">✖</button>
+          </td>
+        </tr>`;
+          });
+        }
+
+        // 2. Atualiza os Selects em todo o app
+        const nomesMembros = data.map((m) => m.nome);
         const selects = [
           document.getElementById("filtro-usuario"),
           document.getElementById("f-usuario"),
@@ -769,26 +814,42 @@
             sel.id === "filtro-usuario"
               ? '<option value="todos">Todos</option>'
               : "";
-          membros.forEach((nome) => {
+          nomesMembros.forEach((nome) => {
             sel.innerHTML += `<option value="${nome}">${nome}</option>`;
           });
           if (valorAnterior) sel.value = valorAnterior;
         });
       }
 
-      async function promptNovoUsuario() {
-        const nome = prompt("Nome do novo membro:");
-        if (nome) {
-          const tabela = sessionStorage.getItem("tabela_ativa");
-          const { error } = await _supabase
-            .from("membros_grupo")
-            .insert([{ nome, tabela_origem: tabela }]);
-          if (error) alert("Erro ao salvar membro.");
-          else carregarDados();
+      async function adicionarMembro() {
+        const input = document.getElementById("novo-membro-nome");
+        const nome = input.value.trim();
+        const tabelaOrigem = sessionStorage.getItem("tabela_ativa");
+
+        if (!nome) return alert("Digite um nome!");
+
+        const { error } = await _supabase
+          .from("membros_grupo")
+          .insert([{ nome, tabela_origem: tabelaOrigem }]);
+        if (error) alert("Erro ao adicionar.");
+        else {
+          input.value = "";
+          carregarMembros();
         }
       }
 
-      // --- OPERAÇÕES ---
+      async function deletarMembro(id) {
+        if (
+          confirm(
+            "Deseja remover este membro? Lançamentos antigos dele continuarão existindo.",
+          )
+        ) {
+          await _supabase.from("membros_grupo").delete().eq("id", id);
+          carregarMembros();
+        }
+      }
+
+      // --- OPERAÇÕES FINANCEIRAS ---
       function toggleParcelas() {
         const tipo = document.getElementById("f-tipo").value;
         document.getElementById("f-parcelas").style.display =
@@ -804,8 +865,8 @@
         const user = document.getElementById("f-usuario").value;
         const status = document.getElementById("f-status").value;
 
-        if (!valorTotal || !dataBase || !desc)
-          return alert("Preencha os campos!");
+        if (!valorTotal || !dataBase || !desc || !user)
+          return alert("Preencha todos os campos!");
 
         if (tipoForm === "parcelado" && !editandoId) {
           const qtd =
@@ -851,7 +912,7 @@
       }
 
       async function deletar(id) {
-        if (confirm("Excluir?")) {
+        if (confirm("Excluir registro?")) {
           await _supabase
             .from(sessionStorage.getItem("tabela_ativa"))
             .delete()
@@ -920,10 +981,10 @@
         });
 
         document.getElementById("metrics-cards").innerHTML = `
-        <div class="metric"><div class="metric-label">Entradas</div><div class="metric-value green">${fmt(ent)}</div></div>
-        <div class="metric"><div class="metric-label">Saídas</div><div class="metric-value red">${fmt(sai)}</div></div>
-        <div class="metric"><div class="metric-label">Saldo</div><div class="metric-value blue">${fmt(ent - sai)}</div></div>
-        <div class="metric"><div class="metric-label">Pendente</div><div class="metric-value amber">${fmt(pen)}</div></div>`;
+    <div class="metric"><div class="metric-label">Entradas</div><div class="metric-value green">${fmt(ent)}</div></div>
+    <div class="metric"><div class="metric-label">Saídas</div><div class="metric-value red">${fmt(sai)}</div></div>
+    <div class="metric"><div class="metric-label">Saldo</div><div class="metric-value blue">${fmt(ent - sai)}</div></div>
+    <div class="metric"><div class="metric-label">Pendente</div><div class="metric-value amber">${fmt(pen)}</div></div>`;
 
         document.getElementById("bell-badge").style.display =
           pen > 0 ? "flex" : "none";
@@ -976,7 +1037,6 @@
         calendar.render();
       }
 
-      // --- NAVEGAÇÃO ---
       function showPage(p, el) {
         document
           .querySelectorAll(".page")
