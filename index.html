@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Finanças — Barbosas</title>
+    <title>Vancce - Finanças</title>
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
       rel="stylesheet"
@@ -293,14 +293,103 @@
   <body>
     <div id="login-screen">
       <div class="login-card">
-        <h2 style="margin-bottom: 25px">Barbosa Finanças</h2>
+        <h2
+          style="
+            margin-bottom: 5px;
+            color: var(--accent);
+            letter-spacing: 2px;
+            font-family: &quot;DM Sans&quot;, sans-serif;
+            font-weight: 600;
+          "
+        >
+          VANCCE
+        </h2>
+        <p
+          style="
+            font-size: 11px;
+            color: var(--text3);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 1px;
+          "
+        >
+          Intelligence Finance
+        </p>
+
         <div class="login-group">
-          <label>Usuário</label><input type="text" id="l-user" />
+          <label>Usuário</label>
+          <input
+            type="text"
+            id="l-user"
+            placeholder="Digite seu usuário"
+            autofocus
+          />
         </div>
+
         <div class="login-group">
-          <label>Senha</label><input type="password" id="l-pass" />
+          <label>Senha</label>
+          <input type="password" id="l-pass" placeholder="••••••••" />
         </div>
-        <button class="btn-primary" onclick="doLogin()">Entrar</button>
+
+        <div
+          style="
+            margin-bottom: 25px;
+            text-align: left;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+          "
+        >
+          <input
+            type="checkbox"
+            id="aceite-lgpd"
+            style="
+              width: 18px;
+              height: 18px;
+              accent-color: var(--accent);
+              cursor: pointer;
+              margin-top: 2px;
+            "
+          />
+          <label
+            for="aceite-lgpd"
+            style="
+              font-size: 11px;
+              color: var(--text2);
+              line-height: 1.5;
+              cursor: pointer;
+            "
+          >
+            Eu li e concordo com os termos da
+            <span
+              style="
+                color: var(--accent);
+                text-decoration: underline;
+                font-weight: 500;
+              "
+              onclick="
+                event.preventDefault();
+                mostrarLGPD();
+              "
+            >
+              Política de Privacidade (LGPD)
+            </span>
+            para o tratamento de meus dados financeiros.
+          </label>
+        </div>
+
+        <button
+          class="btn-primary"
+          onclick="doLogin()"
+          style="width: 100%; height: 45px; font-weight: 600"
+        >
+          Acessar Dashboard
+        </button>
       </div>
     </div>
 
@@ -368,10 +457,19 @@
                 placeholder="Valor"
               />
               <input type="date" id="f-data" />
-              <select id="f-tipo">
+              <select id="f-tipo" onchange="toggleParcelas()">
                 <option value="saida">Saída</option>
                 <option value="entrada">Entrada</option>
+                <option value="parcelado">Parcelamento (Saída)</option>
               </select>
+
+              <input
+                type="number"
+                id="f-parcelas"
+                placeholder="Nº de Parcelas"
+                style="display: none"
+                min="1"
+              />
               <select id="f-usuario">
                 <option value="João">João</option>
                 <option value="Felipe">Felipe</option>
@@ -449,38 +547,199 @@
         </div>
       </div>
     </div>
+    <div
+      id="modal-lgpd"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        backdrop-filter: blur(5px);
+      "
+    >
+      <div
+        style="
+          background: var(--bg2);
+          width: 100%;
+          max-width: 500px;
+          max-height: 80vh;
+          border-radius: 16px;
+          border: 1px solid var(--accent);
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        "
+      >
+        <div
+          style="
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <h3 style="color: var(--accent); margin: 0">
+            Política de Privacidade
+          </h3>
+          <button
+            onclick="fecharLGPD()"
+            style="
+              background: none;
+              border: none;
+              color: var(--text3);
+              font-size: 24px;
+              cursor: pointer;
+            "
+          >
+            &times;
+          </button>
+        </div>
 
+        <div
+          style="
+            padding: 20px;
+            overflow-y: auto;
+            color: var(--text2);
+            font-size: 13px;
+            line-height: 1.6;
+            text-align: left;
+          "
+        >
+          <p style="margin-bottom: 15px">
+            <strong>VANCCE — Intelligence Finance</strong>
+          </p>
+          <p>
+            <strong>1. ACEITE DOS TERMOS:</strong> Ao utilizar esta plataforma,
+            o usuário declara ciência de que seus dados financeiros e de
+            identificação básica serão processados para fins exclusivos de
+            gestão e controle de fluxo de caixa compartilhado.
+          </p>
+          <p>
+            <strong>2. TRANSPARÊNCIA:</strong> Por se tratar de um ecossistema
+            de gestão de grupo, os lançamentos efetuados por um usuário poderão
+            ser visualizados por outros membros autenticados no sistema. Esta
+            visibilidade é necessária para o funcionamento das métricas de saldo
+            e relatórios consolidados.
+          </p>
+          <p>
+            <strong>3. FINALIDADE:</strong> Seus dados são usados para gestão de
+            prazos (contas a pagar), auditoria interna de quem inseriu o gasto e
+            geração de gráficos de desempenho financeiro.
+          </p>
+          <p>
+            <strong>4. SEGURANÇA:</strong> Os dados são armazenados em
+            <strong>nuvem</strong> com criptografia de ponta a ponta. O acesso é
+            restrito e monitorado.
+          </p>
+          <p>
+            <strong>5. SEUS DIREITOS:</strong> Conforme a Lei nº 13.709/2018
+            (LGPD), você pode solicitar a correção ou exclusão definitiva de
+            seus dados a qualquer momento.
+          </p>
+          <p>
+            <strong>6. RESPONSABILIDADE:</strong> O usuário é responsável por
+            manter sua senha segura e inserir apenas informações verídicas.
+          </p>
+        </div>
+
+        <div
+          style="
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+          "
+        >
+          <button
+            class="btn-primary"
+            onclick="fecharLGPD()"
+            style="width: 100%; padding: 10px"
+          >
+            Entendi e Fechar
+          </button>
+        </div>
+      </div>
+    </div>
     <script>
+      // Configurações Supabase
       const SB_URL = "https://zgcimyinowcgwegsjilq.supabase.co";
       const SB_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnY2lteWlub3djZ3dlZ3NqaWxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NDQ5ODMsImV4cCI6MjA5MDEyMDk4M30.y6pXC74FIfwSAeb6uP3WhftbQ82pVPKchOdQwKKxZJY";
       const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
+      // Variáveis Globais
       let lancamentos = [];
       let meuGraficoLinha = null;
       let meuGraficoPizza = null;
       let calendar = null;
       let editandoId = null;
 
+      const CONFIG_ACESSO = {
+        barbosas: { senha: "barbosa.2026", tabela: "lancamentos2" },
+        vancce: { senha: "vancce.demo", tabela: "lancamentos" },
+        cliente2: { senha: "senha123", tabela: "lancamentos_cliente2" },
+      };
+
       const fmt = (v) =>
         "R$ " + (v || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
 
-      function doLogin() {
-        const u = document.getElementById("l-user").value;
+      // --- GESTÃO DE ACESSO E LGPD ---
+      function mostrarLGPD() {
+        document.getElementById("modal-lgpd").style.display = "flex";
+      }
+      function fecharLGPD() {
+        document.getElementById("modal-lgpd").style.display = "none";
+      }
+
+      async function doLogin() {
+        const u = document.getElementById("l-user").value.toLowerCase().trim();
         const p = document.getElementById("l-pass").value;
-        if (u === "barbosas" && p === "barbosa.2026") {
-          sessionStorage.setItem("auth_joao", "true");
+        const checkboxAceite = document.getElementById("aceite-lgpd");
+        const lgpdJaAceita =
+          localStorage.getItem(`vancce_lgpd_${u}`) === "true";
+        const credenciais = CONFIG_ACESSO[u];
+
+        if (credenciais && credenciais.senha === p) {
+          if (!lgpdJaAceita && !checkboxAceite.checked) {
+            alert("Para prosseguir, aceite os termos da LGPD.");
+            return;
+          }
+          if (!lgpdJaAceita && checkboxAceite.checked) {
+            await _supabase.from("registros_lgpd").insert([{ usuario: u }]);
+            localStorage.setItem(`vancce_lgpd_${u}`, "true");
+          }
+          sessionStorage.setItem("auth_vancce", "true");
+          sessionStorage.setItem("tabela_ativa", credenciais.tabela);
+          sessionStorage.setItem("usuario_logado", u);
           document.getElementById("login-screen").style.display = "none";
           document.getElementById("app-screen").style.display = "block";
           carregarDados();
         } else {
-          alert("Acesso negado!");
+          alert("Usuário ou senha incorretos.");
         }
       }
 
+      // --- LOGICA DE PARCELAMENTO ---
+      function toggleParcelas() {
+        const tipo = document.getElementById("f-tipo").value;
+        const campoParcelas = document.getElementById("f-parcelas");
+        if (campoParcelas) {
+          campoParcelas.style.display = tipo === "parcelado" ? "block" : "none";
+        }
+      }
+
+      // --- OPERAÇÕES NO BANCO ---
       async function carregarDados() {
+        const tabela = sessionStorage.getItem("tabela_ativa");
         const { data, error } = await _supabase
-          .from("lancamentos2")
+          .from(tabela)
           .select("*")
           .order("data", { ascending: true });
         if (!error) {
@@ -490,22 +749,56 @@
       }
 
       async function salvarNoBanco() {
-        const dados = {
-          tipo: document.getElementById("f-tipo").value,
-          data: document.getElementById("f-data").value,
-          valor: parseFloat(document.getElementById("f-valor").value),
-          status: document.getElementById("f-status").value,
-          description: document.getElementById("f-desc").value,
-          usuario: document.getElementById("f-usuario").value,
-        };
+        const tabela = sessionStorage.getItem("tabela_ativa");
+        const tipoForm = document.getElementById("f-tipo").value;
+        const valorTotal = parseFloat(document.getElementById("f-valor").value);
+        const dataBaseStr = document.getElementById("f-data").value;
+        const descricaoBase = document.getElementById("f-desc").value;
+        const usuario = document.getElementById("f-usuario").value;
+        const status = document.getElementById("f-status").value;
 
-        if (editandoId) {
-          await _supabase
-            .from("lancamentos2")
-            .update(dados)
-            .eq("id", editandoId);
+        if (!valorTotal || !dataBaseStr || !descricaoBase) {
+          alert("Preencha todos os campos obrigatórios.");
+          return;
+        }
+
+        // Se for parcelado, criamos múltiplos registros
+        if (tipoForm === "parcelado" && !editandoId) {
+          const numParcelas =
+            parseInt(document.getElementById("f-parcelas").value) || 1;
+          const valorParcela = valorTotal / numParcelas;
+          let inserts = [];
+
+          for (let i = 0; i < numParcelas; i++) {
+            let dataParcela = new Date(dataBaseStr + "T12:00:00");
+            dataParcela.setMonth(dataParcela.getMonth() + i);
+
+            inserts.push({
+              tipo: "saida",
+              data: dataParcela.toISOString().split("T")[0],
+              valor: valorParcela,
+              status: status,
+              description: `${descricaoBase} (${i + 1}/${numParcelas})`,
+              usuario: usuario,
+            });
+          }
+          await _supabase.from(tabela).insert(inserts);
         } else {
-          await _supabase.from("lancamentos2").insert([dados]);
+          // Registro simples (ou edição)
+          const dados = {
+            tipo: tipoForm === "parcelado" ? "saida" : tipoForm,
+            data: dataBaseStr,
+            valor: valorTotal,
+            status: status,
+            description: descricaoBase,
+            usuario: usuario,
+          };
+
+          if (editandoId) {
+            await _supabase.from(tabela).update(dados).eq("id", editandoId);
+          } else {
+            await _supabase.from(tabela).insert([dados]);
+          }
         }
 
         closeForm();
@@ -513,39 +806,40 @@
       }
 
       async function marcarComoPago(id) {
-        await _supabase
-          .from("lancamentos2")
-          .update({ status: "pago" })
-          .eq("id", id);
+        const tabela = sessionStorage.getItem("tabela_ativa");
+        await _supabase.from(tabela).update({ status: "pago" }).eq("id", id);
         carregarDados();
       }
 
       async function deletar(id) {
         if (confirm("Excluir permanentemente?")) {
-          await _supabase.from("lancamentos2").delete().eq("id", id);
+          const tabela = sessionStorage.getItem("tabela_ativa");
+          await _supabase.from(tabela).delete().eq("id", id);
           carregarDados();
         }
       }
 
       function prepararEdicao(id) {
-        const l = lancamentos.find((item) => item.id == id);
+        const l = lancamentos.find((x) => x.id == id);
         if (!l) return;
         editandoId = id;
-        document.getElementById("f-tipo").value = l.tipo;
+        document.getElementById("f-desc").value = l.description;
         document.getElementById("f-valor").value = l.valor;
         document.getElementById("f-data").value = l.data;
+        document.getElementById("f-tipo").value = l.tipo;
+        document.getElementById("f-usuario").value = l.usuario;
         document.getElementById("f-status").value = l.status;
-        document.getElementById("f-desc").value = l.description;
-        document.getElementById("f-usuario").value = l.usuario || "João";
+        document.getElementById("form-title").innerText = "Editando Registro";
+        toggleParcelas(); // Garante que o campo de parcelas suma na edição
         openForm();
       }
 
+      // --- RENDERIZAÇÃO E GRÁFICOS ---
       function renderTudo() {
         const filtroUser = document.getElementById("filtro-usuario").value;
-        const filtroMes = document.getElementById("filtro-mes").value; // "YYYY-MM"
+        const filtroMes = document.getElementById("filtro-mes").value;
         const hoje = new Date().toISOString().split("T")[0];
 
-        // 1. Filtragem com Mês e Usuário
         let dadosFiltrados = lancamentos.filter((l) => {
           const matchesUser =
             filtroUser === "todos" || l.usuario === filtroUser;
@@ -563,16 +857,13 @@
 
         let eventos = [];
         let gastosPorUsuario = { João: 0, Felipe: 0, Annia: 0 };
-
-        // Objeto para agrupar dados do gráfico
         let dadosAgrupadosGrafico = {};
 
         [...dadosFiltrados].reverse().forEach((l) => {
           const v = parseFloat(l.valor) || 0;
           const dataBR = l.data.split("-").reverse().join("/");
-
-          // Agrupamento para o gráfico: Soma entradas (+) e subtrai saídas (-)
           const valorFluxo = l.tipo === "entrada" ? v : -v;
+
           dadosAgrupadosGrafico[dataBR] =
             (dadosAgrupadosGrafico[dataBR] || 0) + valorFluxo;
 
@@ -590,37 +881,17 @@
               start: l.data,
               backgroundColor: l.data < hoje ? "#f05c5c" : "#f5a623",
             });
-
-            corpoPrazos.innerHTML += `
-              <tr>
-                <td>${dataBR}</td>
-                <td>${l.description}</td>
-                <td class="amber">${fmt(v)}</td>
-                <td>${l.usuario}</td>
-                <td><button onclick="marcarComoPago('${l.id}')" style="background:none; border:none; color:var(--green); cursor:pointer">✔ Pagar</button></td>
-              </tr>`;
+            corpoPrazos.innerHTML += `<tr><td>${dataBR}</td><td>${l.description}</td><td class="amber">${fmt(v)}</td><td>${l.usuario}</td><td><button onclick="marcarComoPago('${l.id}')" style="background:none; border:none; color:var(--green); cursor:pointer">✔ Pagar</button></td></tr>`;
           }
 
-          corpo.innerHTML += `
-            <tr>
-                <td>${dataBR}</td>
-                <td>${l.description} <br><small style="color:var(--text2)">${l.usuario}</small></td>
-                <td class="${l.tipo === "entrada" ? "green" : "red"}">${fmt(v)}</td>
-                <td><span class="badge ${l.status === "pago" ? "badge-green" : "badge-amber"}">${l.status}</span></td>
-                <td>
-                    ${l.status === "pendente" ? `<button onclick="marcarComoPago('${l.id}')" style="background:none; border:none; color:var(--green); cursor:pointer; margin-right:10px">✔</button>` : ""}
-                    <button onclick="prepararEdicao('${l.id}')" style="background:none; border:none; color:var(--accent); cursor:pointer; margin-right:10px">✎</button>
-                    <button onclick="deletar('${l.id}')" style="background:none; border:none; color:var(--text3); cursor:pointer">✖</button>
-                </td>
-            </tr>`;
+          corpo.innerHTML += `<tr><td>${dataBR}</td><td>${l.description} <br><small style="color:var(--text2)">${l.usuario}</small></td><td class="${l.tipo === "entrada" ? "green" : "red"}">${fmt(v)}</td><td><span class="badge ${l.status === "pago" ? "badge-green" : "badge-amber"}">${l.status}</span></td><td>${l.status === "pendente" ? `<button onclick="marcarComoPago('${l.id}')" style="background:none; border:none; color:var(--green); cursor:pointer; margin-right:10px">✔</button>` : ""}<button onclick="prepararEdicao('${l.id}')" style="background:none; border:none; color:var(--accent); cursor:pointer; margin-right:10px">✎</button><button onclick="deletar('${l.id}')" style="background:none; border:none; color:var(--text3); cursor:pointer">✖</button></td></tr>`;
         });
 
         document.getElementById("metrics-cards").innerHTML = `
-          <div class="metric"><div class="metric-label">Entradas</div><div class="metric-value green">${fmt(ent)}</div></div>
-          <div class="metric"><div class="metric-label">Saídas</div><div class="metric-value red">${fmt(sai)}</div></div>
-          <div class="metric"><div class="metric-label">Saldo</div><div class="metric-value blue">${fmt(ent - sai)}</div></div>
-          <div class="metric"><div class="metric-label">Pendente</div><div class="metric-value amber">${fmt(pen)}</div></div>
-        `;
+      <div class="metric"><div class="metric-label">Entradas</div><div class="metric-value green">${fmt(ent)}</div></div>
+      <div class="metric"><div class="metric-label">Saídas</div><div class="metric-value red">${fmt(sai)}</div></div>
+      <div class="metric"><div class="metric-label">Saldo</div><div class="metric-value blue">${fmt(ent - sai)}</div></div>
+      <div class="metric"><div class="metric-label">Pendente</div><div class="metric-value amber">${fmt(pen)}</div></div>`;
 
         document.getElementById("bell-badge").style.display =
           pen > 0 ? "flex" : "none";
@@ -630,41 +901,15 @@
         desenharGraficoUsuario(gastosPorUsuario);
       }
 
-      function inicializarCalendario(evs) {
-        const el = document.getElementById("calendar");
-        if (calendar) calendar.destroy();
-        calendar = new FullCalendar.Calendar(el, {
-          initialView: "dayGridMonth",
-          locale: "pt-br",
-          events: evs,
-          height: "auto",
-          headerToolbar: {
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,listMonth",
-          },
-          dateClick: function (info) {
-            showPage("lancamentos");
-            openForm();
-            document.getElementById("f-data").value = info.dateStr;
-          },
-        });
-        calendar.render();
-      }
-
       function desenharGraficoLinha(dadosAgrupados) {
         const ctx = document.getElementById("mainChart").getContext("2d");
         if (meuGraficoLinha) meuGraficoLinha.destroy();
-
-        // Ordenar as datas para o gráfico
-        const labels = Object.keys(dadosAgrupados).sort((a, b) => {
-          return (
+        const labels = Object.keys(dadosAgrupados).sort(
+          (a, b) =>
             new Date(a.split("/").reverse().join("-")) -
-            new Date(b.split("/").reverse().join("-"))
-          );
-        });
+            new Date(b.split("/").reverse().join("-")),
+        );
         const valores = labels.map((label) => dadosAgrupados[label]);
-
         meuGraficoLinha = new Chart(ctx, {
           type: "line",
           data: {
@@ -717,6 +962,28 @@
         });
       }
 
+      function inicializarCalendario(evs) {
+        const el = document.getElementById("calendar");
+        if (calendar) calendar.destroy();
+        calendar = new FullCalendar.Calendar(el, {
+          initialView: "dayGridMonth",
+          locale: "pt-br",
+          events: evs,
+          height: "auto",
+          headerToolbar: {
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,listMonth",
+          },
+          dateClick: function (info) {
+            showPage("lancamentos");
+            openForm();
+            document.getElementById("f-data").value = info.dateStr;
+          },
+        });
+        calendar.render();
+      }
+
       function showPage(p, el) {
         document
           .querySelectorAll(".page")
@@ -734,14 +1001,29 @@
         document.getElementById("form-container").style.display = "block";
         window.scrollTo(0, 0);
       }
+
       function closeForm() {
         document.getElementById("form-container").style.display = "none";
         editandoId = null;
+        document.getElementById("form-title").innerText = "Novo Registro";
         document.getElementById("f-desc").value = "";
         document.getElementById("f-valor").value = "";
+        document.getElementById("f-parcelas").value = "";
+        document.getElementById("f-tipo").value = "saida";
+        toggleParcelas();
       }
 
-      if (sessionStorage.getItem("auth_joao") === "true") {
+      window.addEventListener("load", () => {
+        const logado = sessionStorage.getItem("usuario_logado");
+        if (localStorage.getItem(`vancce_lgpd_${logado}`) === "true") {
+          const containerLGPD = document
+            .getElementById("aceite-lgpd")
+            ?.closest("div");
+          if (containerLGPD) containerLGPD.style.display = "none";
+        }
+      });
+
+      if (sessionStorage.getItem("auth_vancce") === "true") {
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("app-screen").style.display = "block";
         carregarDados();
